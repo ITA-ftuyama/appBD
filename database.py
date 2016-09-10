@@ -59,12 +59,31 @@ class Database(object):
     def query_name(self, name):
         u"""Realiza query na tabela."""
         print "Querying name..."
-        self.cursor.execute('SELECT * FROM persons WHERE salesrep=%s', name)
+        result = []
+        self.cursor.execute('SELECT * FROM persons WHERE name=%s', name)
         row = self.cursor.fetchone()
         while row:
+            result.append(row)
             print("ID=%d, Name=%s" % (row[0], row[1]))
             row = self.cursor.fetchone()
         print "Successfully queried!"
+        return result
+
+    def insert(self, idd, name):
+        u"""Insere registro na tabela."""
+        print "Inserting entry..."
+        self.cursor.execute(
+            'INSERT INTO persons VALUES (%d, %s, %s)', (idd, name, name))
+        self.conn.commit()
+        print "Successfully inserted!"
+
+    def delete(self, idd):
+        u"""Realiza query na tabela."""
+        print "Deleting entry..."
+        self.cursor.execute(
+            'DELETE FROM persons WHERE id=%s', idd)
+        self.conn.commit()
+        print "Successfully deleted!"
 
     def disconnect(self):
         u"""Disconecta do Banco de Dados."""

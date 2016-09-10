@@ -6,6 +6,7 @@ u"""Aplicação GUI em alto nível."""
 # Autor: Felipe Tuyama
 from database import Database
 from Tkinter import *
+import tkMessageBox
 
 
 class Application:
@@ -13,6 +14,7 @@ class Application:
 
     def __init__(self, master=None):
         u"""Inicializa a GUI."""
+        self.giu = master
         self.fontePadrao = ("Arial", "12")
         self.primeiroContainer = Frame(master)
         self.primeiroContainer["pady"] = 20
@@ -31,7 +33,7 @@ class Application:
         self.quartoContainer.pack()
 
         self.quintoContainer = Frame(master)
-        self.quintoContainer["pady"] = 40
+        self.quintoContainer["pady"] = 30
         self.quintoContainer.pack()
 
         self.titulo = Label(self.primeiroContainer,
@@ -44,7 +46,7 @@ class Application:
         self.iddLabel.pack(side=LEFT)
 
         self.idd = Entry(self.segundoContainer)
-        self.idd["width"] = 30
+        self.idd["width"] = 20
         self.idd["font"] = self.fontePadrao
         self.idd.pack(side=LEFT)
 
@@ -53,7 +55,7 @@ class Application:
         self.nomeLabel.pack(side=LEFT)
 
         self.nome = Entry(self.terceiroContainer)
-        self.nome["width"] = 30
+        self.nome["width"] = 20
         self.nome["font"] = self.fontePadrao
         self.nome.pack(side=LEFT)
 
@@ -61,31 +63,38 @@ class Application:
         self.buscar["text"] = "Buscar"
         self.buscar["font"] = self.fontePadrao
         self.buscar["width"] = 12
-        self.buscar["command"] = self.verificaSenha
+        self.buscar["command"] = self.buscar_bd
         self.buscar.pack()
 
         self.inserir = Button(self.quartoContainer)
         self.inserir["text"] = "Inserir"
         self.inserir["font"] = self.fontePadrao
         self.inserir["width"] = 12
-        self.inserir["command"] = self.verificaSenha
+        self.inserir["command"] = self.inserir_bd
         self.inserir.pack()
 
         self.deletar = Button(self.quartoContainer)
         self.deletar["text"] = "Deletar"
         self.deletar["font"] = self.fontePadrao
         self.deletar["width"] = 12
-        self.deletar["command"] = self.verificaSenha
+        self.deletar["command"] = self.deletar_bd
         self.deletar.pack()
 
         self.mensagem = Label(self.quartoContainer,
                               text="", font=self.fontePadrao)
         self.mensagem.pack()
+
         self.listar_bd()
 
     def listar_bd(self):
-        u"""Conecta ao banco de dados."""
+        u"""Lista tabela do banco de dados."""
         lista = db.list_table()
+
+        self.quintoContainer.destroy()
+
+        self.quintoContainer = Frame(self.giu)
+        self.quintoContainer["pady"] = 30
+        self.quintoContainer.pack()
 
         self.lista_label = Label(
             self.quintoContainer,
@@ -94,35 +103,43 @@ class Application:
         )
         self.lista_label.pack()
 
-        entry = Entry(self.quintoContainer)
-        entry.insert(END, '%5s | %20s' % ("ID", "NOME DO PACIENTE"))
-        entry["width"] = 30
-        entry["font"] = self.fontePadrao
-        entry.pack()
+        self.entry = Entry(self.quintoContainer)
+        self.entry.insert(END, '%5s | %20s' % ("ID", "NOME DO PACIENTE"))
+        self.entry["width"] = 25
+        self.entry["font"] = self.fontePadrao
+        self.entry.pack()
+
         for elem in lista:
-            entry = Entry(self.quintoContainer)
-            entry["width"] = 30
-            entry["font"] = self.fontePadrao
-            entry.insert(END, '%5s | %20s' % (elem[0], elem[1]))
-            entry.pack()
+            self.entry = Entry(self.quintoContainer)
+            self.entry["width"] = 25
+            self.entry["font"] = self.fontePadrao
+            self.entry.insert(END, '%5s | %20s' % (elem[0], elem[1]))
+            self.entry.pack()
 
     def criar_bd(self):
         u"""Cria nova tabela no banco de dados."""
         db.create_table()
+        self.listar_bd()
 
     def buscar_bd(self):
         u"""Busca registro no banco de dados."""
-        db.query_name('John Smith')
+        result = db.query_name(self.nome.get())
+        result_display = ""
+        for row in result:
+            result_display += '%s - %s\n' % (row[0], row[1])
+        tkMessageBox.showinfo(
+            "Resultado da busca", result_display)
+        self.listar_bd()
 
-    def verificaSenha(self):
-        u"""Lista registros da tabela."""
-        usuario = self.nome.get()
-        senha = self.senha.get()
-        if usuario == "usuariodevmedia" and senha == "dev":
-            self.mensagem["text"] = "Autenticado"
-        else:
-            self.mensagem["text"] = "Erro na autenticação"
+    def inserir_bd(self):
+        u"""Insere registro no banco de dados."""
+        db.insert(int(self.idd.get()), self.nome.get())
+        self.listar_bd()
 
+    def deletar_bd(self):
+        u"""Deleta registro no banco de dados."""
+        db.delete(int(self.idd.get()))
+        self.listar_bd()
 
 db = Database()
 db.connect()
