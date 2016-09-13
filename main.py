@@ -15,18 +15,22 @@ class Application:
     def __init__(self, master=None):
         u"""Inicializa a GUI."""
         self.giu = master
-        self.fontePadrao = ("Arial", "12")
+        self.fontePadrao = ("Consolas", "12")
         self.primeiroContainer = Frame(master)
         self.primeiroContainer["pady"] = 20
         self.primeiroContainer.pack()
 
         self.segundoContainer = Frame(master)
-        self.segundoContainer["padx"] = 20
+        self.segundoContainer["padx"] = 50
         self.segundoContainer.pack()
 
         self.terceiroContainer = Frame(master)
-        self.terceiroContainer["padx"] = 20
+        self.terceiroContainer["padx"] = 50
         self.terceiroContainer.pack()
+
+        self.tresmeioContainer = Frame(master)
+        self.tresmeioContainer["padx"] = 50
+        self.tresmeioContainer.pack()
 
         self.quartoContainer = Frame(master)
         self.quartoContainer["pady"] = 20
@@ -42,36 +46,52 @@ class Application:
         self.titulo.pack()
 
         self.iddLabel = Label(self.segundoContainer,
-                              text="___Id: ", font=self.fontePadrao)
+                              text="__Id  : ", font=self.fontePadrao)
         self.iddLabel.pack(side=LEFT)
 
         self.idd = Entry(self.segundoContainer)
-        self.idd["width"] = 20
+        self.idd["width"] = 30
         self.idd["font"] = self.fontePadrao
         self.idd.pack(side=LEFT)
 
         self.nomeLabel = Label(self.terceiroContainer,
-                               text="Nome: ", font=self.fontePadrao)
+                               text="Nome  : ", font=self.fontePadrao)
         self.nomeLabel.pack(side=LEFT)
 
         self.nome = Entry(self.terceiroContainer)
-        self.nome["width"] = 20
+        self.nome["width"] = 30
         self.nome["font"] = self.fontePadrao
         self.nome.pack(side=LEFT)
 
-        self.buscar = Button(self.quartoContainer)
-        self.buscar["text"] = "Buscar Id"
-        self.buscar["font"] = self.fontePadrao
-        self.buscar["width"] = 12
-        self.buscar["command"] = self.buscar_id_bd
-        self.buscar.pack()
+        self.doencaLabel = Label(self.tresmeioContainer,
+                                 text="Doença: ", font=self.fontePadrao)
+        self.doencaLabel.pack(side=LEFT)
 
-        self.buscar = Button(self.quartoContainer)
-        self.buscar["text"] = "Buscar Nome"
-        self.buscar["font"] = self.fontePadrao
-        self.buscar["width"] = 12
-        self.buscar["command"] = self.buscar_nome_bd
-        self.buscar.pack()
+        self.doenca = Entry(self.tresmeioContainer)
+        self.doenca["width"] = 30
+        self.doenca["font"] = self.fontePadrao
+        self.doenca.pack(side=LEFT)
+
+        self.criad = Button(self.quartoContainer)
+        self.criad["text"] = "Criar BD"
+        self.criad["font"] = self.fontePadrao
+        self.criad["width"] = 12
+        self.criad["command"] = self.criar_bd
+        self.criad.pack()
+
+        self.buscar_id = Button(self.quartoContainer)
+        self.buscar_id["text"] = "Buscar Id"
+        self.buscar_id["font"] = self.fontePadrao
+        self.buscar_id["width"] = 12
+        self.buscar_id["command"] = self.buscar_id_bd
+        self.buscar_id.pack()
+
+        self.buscar_nome = Button(self.quartoContainer)
+        self.buscar_nome["text"] = "Buscar Nome"
+        self.buscar_nome["font"] = self.fontePadrao
+        self.buscar_nome["width"] = 12
+        self.buscar_nome["command"] = self.buscar_nome_bd
+        self.buscar_nome.pack()
 
         self.inserir = Button(self.quartoContainer)
         self.inserir["text"] = "Inserir"
@@ -103,7 +123,7 @@ class Application:
         self.quintoContainer.destroy()
 
         self.quintoContainer = Frame(self.giu)
-        self.quintoContainer["pady"] = 30
+        self.quintoContainer["pady"] = 40
         self.quintoContainer.pack()
 
         self.lista_label = Label(
@@ -114,23 +134,31 @@ class Application:
         self.lista_label.pack()
 
         self.entry = Entry(self.quintoContainer)
-        self.entry.insert(END, '%5s | %20s' % ("ID", "NOME DO PACIENTE"))
-        self.entry["width"] = 25
+        self.entry.insert(
+            END, '%3s | %17s | %12s' % ("ID", "NOME DO PACIENTE", "DOENÇA")
+        )
+        self.entry["width"] = 40
         self.entry["font"] = self.fontePadrao
         self.entry.pack()
 
         for elem in lista:
             self.entry = Entry(self.quintoContainer)
-            self.entry["width"] = 25
+            self.entry["width"] = 40
             self.entry["font"] = self.fontePadrao
-            self.entry.insert(END, '%5s | %20s' % (elem[0], elem[1]))
+            self.entry.insert(
+                END, '%3s | %17s | %12s' % (elem[0], elem[1], elem[2])
+            )
             self.entry.pack()
 
     def display_result(self, result):
         u"""Exibe resultado de busca."""
         tkMessageBox.showinfo(
             "Resultado da busca",
-            '\n'.join(['%5s - %-20s' % (row[0], row[1]) for row in result])
+            '\n'.join(
+                ['%3s - %-17s - %-15s' % (
+                    row[0], row[1], row[2]
+                ) for row in result]
+            )
         )
 
     def criar_bd(self):
@@ -148,12 +176,16 @@ class Application:
 
     def inserir_bd(self):
         u"""Insere registro no banco de dados."""
-        db.insert(int(self.idd.get()), self.nome.get())
+        db.insert(
+            int(self.idd.get()), self.nome.get(), self.doenca.get()
+        )
         self.listar_bd()
 
     def editar_bd(self):
         u"""Edita registro no banco de dados."""
-        db.update(int(self.idd.get()), self.nome.get())
+        db.update(
+            int(self.idd.get()), self.nome.get(), self.doenca.get()
+        )
         self.listar_bd()
 
     def deletar_bd(self):

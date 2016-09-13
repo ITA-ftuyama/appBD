@@ -29,16 +29,16 @@ class Database(object):
                 DROP TABLE persons
             CREATE TABLE persons (
                 id INT NOT NULL,
-                name VARCHAR(100),
-                salesrep VARCHAR(100),
+                name VARCHAR(20),
+                doenca VARCHAR(15),
                 PRIMARY KEY(id)
             )
         """)
         self.cursor.executemany(
             "INSERT INTO persons VALUES (%d, %s, %s)",
-            [(1, 'John Smith', 'John Doe'),
-             (2, 'Jane Doe', 'Joe Dog'),
-             (3, 'Mike T.', 'Sarah H.')])
+            [(1, 'Joao Pedro', 'Gripe'),
+             (2, 'Ze da Silva', 'Conjutivite'),
+             (3, 'Silvestre', 'Reumatismo')])
         self.conn.commit()
 
     def list_table(self):
@@ -59,18 +59,18 @@ class Database(object):
             'SELECT * FROM persons WHERE name=%s', name)
         return self.cursor.fetchall()
 
-    def insert(self, idd, name):
+    def insert(self, idd, name, doenca):
         u"""Insere registro na tabela."""
         self.cursor.execute(
             'INSERT INTO persons VALUES (%d, %s, %s)',
-            (idd, name, name))
+            (idd, name, doenca))
         self.conn.commit()
 
-    def update(self, idd, name):
+    def update(self, idd, name, doenca):
         u"""Insere registro na tabela."""
         self.cursor.execute(
-            'UPDATE persons SET name=%s, salesrep=%s WHERE id=%d',
-            (name, name, idd))
+            'UPDATE persons SET name=%s, doenca=%s WHERE id=%d',
+            (name, doenca, idd))
         self.conn.commit()
 
     def delete(self, idd):
