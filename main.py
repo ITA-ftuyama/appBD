@@ -155,7 +155,7 @@ class Application:
         tkMessageBox.showinfo(
             "Resultado da busca",
             '\n'.join(
-                ['%3s - %-17s - %-15s' % (
+                ['%s - %s - %s' % (
                     row[0], row[1], row[2]
                 ) for row in result]
             )
